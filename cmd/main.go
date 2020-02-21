@@ -54,9 +54,15 @@ func main() {
 		},
 
 		cli.StringFlag{
-			Name:  "path",
-			Usage: "The base path for all files and certificates",
-			Value: "./data",
+			Name:  "genesis-file",
+			Usage: "The path to the genesis file",
+			Value: "./etc/genesis.json",
+		},
+
+		cli.StringFlag{
+			Name:  "entity-path",
+			Usage: "The path to the genesis file",
+			Value: "./node/entity",
 		},
 
 		cli.StringFlag{
@@ -90,12 +96,12 @@ func main() {
 }
 
 func run(context *cli.Context) error {
-	basePath, err := filepath.Abs(context.GlobalString("path"))
+	genesisFile, entityPath, err := setupPaths(context)
 	if err != nil {
 		return err
 	}
 
-	if err := genesis.LoadDocument(basePath); err != nil {
+	if err := genesis.LoadDocument(genesisFile); err != nil {
 		return err
 	}
 
@@ -107,7 +113,7 @@ func run(context *cli.Context) error {
 	socket := context.GlobalString("socket")
 	fmt.Println(fmt.Sprintf("The socket address is now %s", socket))
 
-	signer, err := transactions.LoadSigner(basePath)
+	signer, err := transactions.LoadSigner(entityPath)
 	if err != nil {
 		return err
 	}
@@ -118,4 +124,18 @@ func run(context *cli.Context) error {
 	}
 
 	return nil
+}
+
+func setupPaths(context *cli.Context) (string, string, error) {
+	genesisFile, err := filepath.Abs(context.GlobalString("genesis-file"))
+	if err != nil {
+		return "", "", err
+	}
+
+	entityPath, err := filepath.Abs(context.GlobalString("entity-path"))
+	if err != nil {
+		return "", "", err
+	}
+
+	return genesisFile, entityPath, nil
 }
