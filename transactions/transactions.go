@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/SebastianJ/oasis-spammer/rpc"
 	"github.com/SebastianJ/oasis-spammer/utils"
@@ -56,8 +57,10 @@ func Send(signer signature.Signer, to string, amount string, nonce uint64, gasFe
 	}
 
 	if err := client.SubmitTx(context.Background(), signedTx); err != nil {
-		fmt.Printf("failed to submit transaction, err: %s\n", err.Error())
-		return err
+		if !strings.Contains(err.Error(), "staking: forbidden by policy") {
+			fmt.Printf("Failed to submit transaction, err: %s\n", err.Error())
+			return err
+		}
 	}
 
 	return nil
