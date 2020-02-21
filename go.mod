@@ -10,6 +10,7 @@ replace (
 )
 
 require (
+	github.com/SebastianJ/harmony-tf v0.0.0-20200220151811-789fa0758a50
 	github.com/oasislabs/oasis-core/go v0.0.0-20200210160800-cef4925f3105
 	github.com/urfave/cli v1.22.2
 	google.golang.org/grpc v1.25.1

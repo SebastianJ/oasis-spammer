@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/SebastianJ/oasis-spammer/rpc"
 	"github.com/SebastianJ/oasis-spammer/utils"
@@ -15,6 +16,12 @@ import (
 	"github.com/oasislabs/oasis-core/go/consensus/api/transaction"
 	staking "github.com/oasislabs/oasis-core/go/staking/api"
 )
+
+// AsyncSend - send transactions using goroutines/waitgroups
+func AsyncSend(signer signature.Signer, to string, amount string, nonce uint64, gasFee string, gasLimit uint64, socket string, waitGroup *sync.WaitGroup) {
+	defer waitGroup.Done()
+	Send(signer, to, amount, nonce, gasFee, gasLimit, socket)
+}
 
 // Send - send transactions
 func Send(signer signature.Signer, to string, amount string, nonce uint64, gasFee string, gasLimit uint64, socket string) error {

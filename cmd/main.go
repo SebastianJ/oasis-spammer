@@ -71,6 +71,18 @@ func main() {
 			Value: "unix:node/internal.sock",
 		},
 
+		cli.IntFlag{
+			Name:  "count",
+			Usage: "How many transactions to send in total",
+			Value: 1000,
+		},
+
+		cli.IntFlag{
+			Name:  "pool-size",
+			Usage: "How many transactions to send simultaneously",
+			Value: 100,
+		},
+
 		cli.BoolFlag{
 			Name:  "verbose",
 			Usage: "Enable more verbose output",
@@ -111,17 +123,20 @@ func run(context *cli.Context) error {
 	gasFee := context.GlobalString("gas.fee")
 	gasLimit := context.GlobalUint64("gas.limit")
 	socket := context.GlobalString("socket")
-	fmt.Println(fmt.Sprintf("The socket address is now %s", socket))
+	count := context.GlobalInt("count")
+	poolSize := context.GlobalInt("pool-size")
 
 	signer, err := transactions.LoadSigner(entityPath)
 	if err != nil {
 		return err
 	}
 
-	err = transactions.Send(signer, to, amount, nonce, gasFee, gasLimit, socket)
+	transactions.AsyncBulkSendTransactions(signer, to, amount, nonce, gasFee, gasLimit, socket, count, poolSize)
+
+	/*err = transactions.Send(signer, to, amount, nonce, gasFee, gasLimit, socket)
 	if err != nil {
 		return err
-	}
+	}*/
 
 	return nil
 }
