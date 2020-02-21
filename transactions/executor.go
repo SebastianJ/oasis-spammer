@@ -5,6 +5,7 @@ import (
 	"math"
 	"sync"
 
+	"github.com/SebastianJ/oasis-spammer/rpc"
 	"github.com/oasislabs/oasis-core/go/common/crypto/signature"
 )
 
@@ -13,6 +14,11 @@ func AsyncBulkSendTransactions(signer signature.Signer, to string, amount string
 	pools := 1
 
 	fmt.Println(fmt.Sprintf("Current nonce is: %d", nonce))
+
+	newNonce, err := rpc.CurrentNonce(signer, socket)
+	if err == nil {
+		fmt.Printf("NewNonce: %+v\n", newNonce)
+	}
 
 	if count > poolSize {
 		pools = int(math.RoundToEven(float64(count) / float64(poolSize)))
