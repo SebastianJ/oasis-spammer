@@ -9,9 +9,7 @@ import (
 )
 
 // LoadDocument - loads the genesis document from a given path
-func LoadDocument(path string) error {
-	genesisPath := fmt.Sprintf("%s/genesis.json", path)
-
+func LoadDocument(genesisPath string) error {
 	// Set up the genesis system for the signature system's chain context.
 	genesis, err := parseGenesisDocument(genesisPath)
 	if err != nil {
