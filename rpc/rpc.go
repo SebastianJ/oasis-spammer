@@ -3,7 +3,6 @@ package rpc
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/oasislabs/oasis-core/go/common/crypto/signature"
 	cmnGrpc "github.com/oasislabs/oasis-core/go/common/grpc"
@@ -29,11 +28,7 @@ func CurrentNonce(signer signature.Signer, address string) (uint64, error) {
 		return 0, err
 	}
 
-	fmt.Printf("Acct: %+v\n", acct)
-
-	os.Exit(-1)
-
-	return 0, nil
+	return acct.General.Nonce, nil
 }
 
 // ConsensusClient - initiate a new consensus client

@@ -15,11 +15,6 @@ func AsyncBulkSendTransactions(signer signature.Signer, to string, amount string
 
 	fmt.Println(fmt.Sprintf("Current nonce is: %d", nonce))
 
-	newNonce, err := rpc.CurrentNonce(signer, socket)
-	if err == nil {
-		fmt.Printf("NewNonce: %+v\n", newNonce)
-	}
-
 	if count > poolSize {
 		pools = int(math.RoundToEven(float64(count) / float64(poolSize)))
 		fmt.Println(fmt.Sprintf("Number of goroutine pools: %d", pools))
@@ -29,8 +24,11 @@ func AsyncBulkSendTransactions(signer signature.Signer, to string, amount string
 		var waitGroup sync.WaitGroup
 
 		if poolIndex > 1 {
-			//refresh nonce
-			//fmt.Println(fmt.Sprintf("Nonce refreshed! Nonce is now: %d", currentNonce))
+			newNonce, err := rpc.CurrentNonce(signer, socket)
+			if err == nil {
+				nonce = newNonce
+				fmt.Println(fmt.Sprintf("Nonce refreshed! Nonce is now: %d", nonce))
+			}
 		}
 
 		for i := 0; i < poolSize; i++ {
