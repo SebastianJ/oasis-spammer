@@ -23,15 +23,13 @@ func AsyncBulkSendTransactions(signer signature.Signer, to string, amount string
 	for poolIndex := 0; poolIndex < pools; poolIndex++ {
 		var waitGroup sync.WaitGroup
 
-		if poolIndex > 1 {
+		for i := 0; i < poolSize; i++ {
 			newNonce, err := rpc.CurrentNonce(signer, socket)
 			if err == nil {
 				nonce = newNonce
 				fmt.Println(fmt.Sprintf("Nonce refreshed! Nonce is now: %d", nonce))
 			}
-		}
 
-		for i := 0; i < poolSize; i++ {
 			waitGroup.Add(1)
 			go AsyncSend(signer, to, amount, nonce, gasFee, gasLimit, socket, &waitGroup)
 			nonce++
