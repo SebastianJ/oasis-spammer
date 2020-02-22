@@ -1,0 +1,18 @@
+amount: 
+nonce: -1
+gas_fee: "1"
+gas_limit: 1000
+genesis_file: "./etc/genesis.json"
+entity_path: "./node/entity"
+socket: "unix:node/internal.sock"
+
+transactions:
+  amount: "0.000000000000000001"
+  data: ""
+  count: 1000
+  pool_size: 100
+  nonce: -1
+  gas:
+    fee: "1"
+    limit: 100
+  

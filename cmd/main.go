@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/SebastianJ/oasis-spammer/genesis"
+	"github.com/SebastianJ/oasis-spammer/config"
 	"github.com/SebastianJ/oasis-spammer/transactions"
 
 	"github.com/urfave/cli"
@@ -54,6 +54,12 @@ func main() {
 		},
 
 		cli.StringFlag{
+			Name:  "path",
+			Usage: "The path relative to the binary where config.yml and other files can be found",
+			Value: "./",
+		},
+
+		cli.StringFlag{
 			Name:  "genesis-file",
 			Usage: "The path to the genesis file",
 			Value: "./etc/genesis.json",
@@ -83,6 +89,12 @@ func main() {
 			Value: 100,
 		},
 
+		cli.StringFlag{
+			Name:  "data",
+			Usage: "The tx data to send with each request",
+			Value: "",
+		},
+
 		cli.BoolFlag{
 			Name:  "verbose",
 			Usage: "Enable more verbose output",
@@ -108,49 +120,16 @@ func main() {
 }
 
 func run(context *cli.Context) error {
-	genesisFile, entityPath, err := setupPaths(context)
+	basePath, err := filepath.Abs(context.GlobalString("path"))
 	if err != nil {
 		return err
 	}
 
-	if err := genesis.LoadDocument(genesisFile); err != nil {
+	if err := config.Configure(basePath, context); err != nil {
 		return err
 	}
 
-	to := context.GlobalString("to")
-	amount := context.GlobalString("amount")
-	nonce := context.GlobalUint64("nonce")
-	gasFee := context.GlobalString("gas.fee")
-	gasLimit := context.GlobalUint64("gas.limit")
-	socket := context.GlobalString("socket")
-	count := context.GlobalInt("count")
-	poolSize := context.GlobalInt("pool-size")
-
-	signer, err := transactions.LoadSigner(entityPath)
-	if err != nil {
-		return err
-	}
-
-	transactions.AsyncBulkSendTransactions(signer, to, amount, nonce, gasFee, gasLimit, socket, count, poolSize)
-
-	/*err = transactions.Send(signer, to, amount, nonce, gasFee, gasLimit, socket)
-	if err != nil {
-		return err
-	}*/
+	transactions.AsyncBulkSendTransactions(config.Configuration.Signer, config.Configuration.Transactions.Amount, config.Configuration.Transactions.Nonce, config.Configuration.Transactions.Gas.Fee, config.Configuration.Transactions.Gas.Limit, config.Configuration.Transactions.Count, config.Configuration.Transactions.PoolSize)
 
 	return nil
-}
-
-func setupPaths(context *cli.Context) (string, string, error) {
-	genesisFile, err := filepath.Abs(context.GlobalString("genesis-file"))
-	if err != nil {
-		return "", "", err
-	}
-
-	entityPath, err := filepath.Abs(context.GlobalString("entity-path"))
-	if err != nil {
-		return "", "", err
-	}
-
-	return genesisFile, entityPath, nil
 }

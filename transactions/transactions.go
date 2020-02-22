@@ -4,15 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/SebastianJ/oasis-spammer/config"
 	"github.com/SebastianJ/oasis-spammer/rpc"
 	"github.com/SebastianJ/oasis-spammer/utils"
 	"github.com/oasislabs/oasis-core/go/common/crypto/signature"
-	fileSigner "github.com/oasislabs/oasis-core/go/common/crypto/signature/signers/file"
-	"github.com/oasislabs/oasis-core/go/common/entity"
 	"github.com/oasislabs/oasis-core/go/common/quantity"
 	"github.com/oasislabs/oasis-core/go/consensus/api/transaction"
 	"github.com/oasislabs/oasis-core/go/staking/api"
@@ -25,18 +26,20 @@ type Transfer struct {
 }
 
 // AsyncSend - send transactions using goroutines/waitgroups
-func AsyncSend(signer signature.Signer, to string, amount string, nonce uint64, gasFee string, gasLimit uint64, socket string, waitGroup *sync.WaitGroup) {
+func AsyncSend(signer signature.Signer, amount string, nonce uint64, gasFee string, gasLimit uint64, waitGroup *sync.WaitGroup) {
 	defer waitGroup.Done()
-	Send(signer, to, amount, nonce, gasFee, gasLimit, socket)
+	Send(signer, amount, nonce, gasFee, gasLimit)
 }
 
 // Send - send transactions
-func Send(signer signature.Signer, to string, amount string, nonce uint64, gasFee string, gasLimit uint64, socket string) error {
+func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, gasLimit uint64) error {
 	//defer signer.Reset()
 	bigAmount, _ := utils.ConvertNumeralStringToBigInt(amount)
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	toAddress := utils.RandomStringSliceItem(r, config.Configuration.Transactions.Receivers)
 
 	var xfer Transfer
-	if err := xfer.To.UnmarshalText([]byte(to)); err != nil {
+	if err := xfer.To.UnmarshalText([]byte(toAddress)); err != nil {
 		fmt.Printf("failed to parse transfer destination ID, err: %s\n", err.Error())
 		return err
 	}
@@ -58,18 +61,20 @@ func Send(signer signature.Signer, to string, amount string, nonce uint64, gasFe
 
 	//tx := staking.NewTransferTx(nonce, &fee, &xfer)
 
-	fmt.Println("")
-	fmt.Printf("tx: %+v\n", tx)
-	tx.PrettyPrint("", os.Stdout)
+	if config.Configuration.Verbose {
+		tx.PrettyPrint("", os.Stdout)
+	}
 
 	signedTx, rawSignedTx, err := sign(signer, tx)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Signed tx: %s\n", rawSignedTx)
+	if config.Configuration.Verbose {
+		fmt.Printf("Signed tx: %s\n", rawSignedTx)
+	}
 
-	_, client, err := rpc.ConsensusClient(socket)
+	_, client, err := rpc.ConsensusClient(config.Configuration.Socket)
 	if err != nil {
 		return err
 	}
@@ -91,9 +96,9 @@ func sign(signer signature.Signer, tx *transaction.Transaction) (*transaction.Si
 		return nil, nil, err
 	}
 
-	fmt.Println("")
-	fmt.Printf("sigTx: %+v\n", sigTx)
-	sigTx.PrettyPrint("", os.Stdout)
+	if config.Configuration.Verbose {
+		sigTx.PrettyPrint("", os.Stdout)
+	}
 
 	rawTx, err := json.Marshal(sigTx)
 	if err != nil {
@@ -102,21 +107,4 @@ func sign(signer signature.Signer, tx *transaction.Transaction) (*transaction.Si
 	}
 
 	return sigTx, rawTx, nil
-}
-
-// LoadSigner - loads the signer from the PEM file
-func LoadSigner(path string) (signature.Signer, error) {
-	fmt.Printf("Path is: %s\n", path)
-	_, signer, err := loadEntity(path)
-	if err != nil {
-		fmt.Printf("failed to load account entity, err: %s\n", err.Error())
-		return nil, err
-	}
-
-	return signer, nil
-}
-
-func loadEntity(entityDir string) (*entity.Entity, signature.Signer, error) {
-	factory := fileSigner.NewFactory(entityDir, signature.SignerEntity)
-	return entity.Load(entityDir, factory)
 }

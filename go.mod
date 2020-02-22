@@ -10,9 +10,13 @@ replace (
 )
 
 require (
-	github.com/SebastianJ/harmony-tf v0.0.0-20200220151811-789fa0758a50
 	github.com/oasislabs/oasis-core/go v0.0.0-20200210160800-cef4925f3105
-	github.com/spf13/viper v1.6.1
+	github.com/prometheus/client_golang v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/viper v1.6.1 // indirect
 	github.com/urfave/cli v1.22.2
+	golang.org/x/net v0.0.0-20190923162816-aa69164e4478 // indirect
+	golang.org/x/sys v0.0.0-20191026070338-33540a1f6037 // indirect
 	google.golang.org/grpc v1.25.1
+	gopkg.in/yaml.v2 v2.2.7
 )
