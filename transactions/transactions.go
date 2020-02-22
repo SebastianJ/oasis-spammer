@@ -13,9 +13,16 @@ import (
 	"github.com/oasislabs/oasis-core/go/common/crypto/signature"
 	fileSigner "github.com/oasislabs/oasis-core/go/common/crypto/signature/signers/file"
 	"github.com/oasislabs/oasis-core/go/common/entity"
+	"github.com/oasislabs/oasis-core/go/common/quantity"
 	"github.com/oasislabs/oasis-core/go/consensus/api/transaction"
-	staking "github.com/oasislabs/oasis-core/go/staking/api"
+	"github.com/oasislabs/oasis-core/go/staking/api"
 )
+
+type Transfer struct {
+	To     signature.PublicKey `json:"xfer_to"`
+	Tokens quantity.Quantity   `json:"xfer_tokens"`
+	Data   []byte              `json:"xfer_data"`
+}
 
 // AsyncSend - send transactions using goroutines/waitgroups
 func AsyncSend(signer signature.Signer, to string, amount string, nonce uint64, gasFee string, gasLimit uint64, socket string, waitGroup *sync.WaitGroup) {
@@ -28,7 +35,7 @@ func Send(signer signature.Signer, to string, amount string, nonce uint64, gasFe
 	//defer signer.Reset()
 	bigAmount, _ := utils.ConvertNumeralStringToBigInt(amount)
 
-	var xfer staking.Transfer
+	var xfer Transfer
 	if err := xfer.To.UnmarshalText([]byte(to)); err != nil {
 		fmt.Printf("failed to parse transfer destination ID, err: %s\n", err.Error())
 		return err
@@ -38,6 +45,8 @@ func Send(signer signature.Signer, to string, amount string, nonce uint64, gasFe
 		return err
 	}
 
+	xfer.Data = []byte("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+
 	var fee transaction.Fee
 	if err := fee.Amount.UnmarshalText([]byte(gasFee)); err != nil {
 		fmt.Printf("failed to parse fee amount, err: %s\n", err.Error())
@@ -45,7 +54,9 @@ func Send(signer signature.Signer, to string, amount string, nonce uint64, gasFe
 	}
 	fee.Gas = transaction.Gas(gasLimit)
 
-	tx := staking.NewTransferTx(nonce, &fee, &xfer)
+	tx := transaction.NewTransaction(nonce, &fee, api.MethodTransfer, xfer)
+
+	//tx := staking.NewTransferTx(nonce, &fee, &xfer)
 
 	fmt.Println("")
 	fmt.Printf("tx: %+v\n", tx)
