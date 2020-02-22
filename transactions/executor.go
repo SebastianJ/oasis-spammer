@@ -24,10 +24,12 @@ func AsyncBulkSendTransactions(signer signature.Signer, amount string, nonce uin
 	for poolIndex := 0; poolIndex < pools; poolIndex++ {
 		var waitGroup sync.WaitGroup
 
-		newNonce, err := rpc.CurrentNonce(signer, config.Configuration.Socket)
-		if err == nil {
-			nonce = newNonce
-			fmt.Println(fmt.Sprintf("Nonce refreshed! Nonce is now: %d", nonce))
+		if poolIndex > 1 {
+			newNonce, err := rpc.CurrentNonce(signer, config.Configuration.Socket)
+			if err == nil {
+				nonce = newNonce
+				fmt.Println(fmt.Sprintf("Nonce refreshed! Nonce is now: %d", nonce))
+			}
 		}
 
 		for i := 0; i < poolSize; i++ {
