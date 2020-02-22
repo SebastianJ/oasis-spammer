@@ -70,7 +70,7 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 		fmt.Printf("Sending Transaction:\n\tTo: %s\n\tAmount: %s\n\tNonce: %d\n\tData (bytes): %d\n\n", toAddress, amount, nonce, len(xfer.Data))
 	}
 
-	signedTx, rawSignedTx, err := sign(signer, tx)
+	signedTx, _, err := sign(signer, tx)
 	if err != nil {
 		return err
 	}
