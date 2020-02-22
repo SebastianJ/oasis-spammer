@@ -43,12 +43,13 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 		fmt.Printf("failed to parse transfer destination ID, err: %s\n", err.Error())
 		return err
 	}
+
 	if err := xfer.Tokens.FromBigInt(bigAmount); err != nil {
 		fmt.Printf("failed to parse transfer amount, err: %s\n", err.Error())
 		return err
 	}
 
-	xfer.Data = []byte("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+	xfer.Data = []byte(config.Configuration.Transactions.Data)
 
 	var fee transaction.Fee
 	if err := fee.Amount.UnmarshalText([]byte(gasFee)); err != nil {
@@ -63,6 +64,11 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 
 	if config.Configuration.Verbose {
 		tx.PrettyPrint("", os.Stdout)
+		fmt.Println("")
+	}
+
+	if config.Configuration.Verbose {
+		fmt.Printf("Sending Transaction:\n\tTo: %s\n\tAmount: %s\n\tNonce: %d\n\tData (bytes): %d\n\n", toAddress, amount, nonce, len(xfer.Data))
 	}
 
 	signedTx, rawSignedTx, err := sign(signer, tx)
@@ -98,6 +104,7 @@ func sign(signer signature.Signer, tx *transaction.Transaction) (*transaction.Si
 
 	if config.Configuration.Verbose {
 		sigTx.PrettyPrint("", os.Stdout)
+		fmt.Println("")
 	}
 
 	rawTx, err := json.Marshal(sigTx)

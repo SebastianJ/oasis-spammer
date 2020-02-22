@@ -24,12 +24,6 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "to",
-			Usage: "Where to send the tokens",
-			Value: "8uNiDud/L0d0muEGb2t5BFnjupStWasyjdErHFnjQXk=",
-		},
-
-		cli.StringFlag{
 			Name:  "amount",
 			Usage: "How many tokens to send per transaction",
 			Value: "0.000000000000000001",
