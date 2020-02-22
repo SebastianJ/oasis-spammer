@@ -75,9 +75,9 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 		return err
 	}
 
-	if config.Configuration.Verbose {
+	/*if config.Configuration.Verbose {
 		fmt.Printf("Signed tx: %s\n", rawSignedTx)
-	}
+	}*/
 
 	_, client, err := rpc.ConsensusClient(config.Configuration.Socket)
 	if err != nil {
