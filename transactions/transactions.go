@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -62,10 +61,10 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 
 	//tx := staking.NewTransferTx(nonce, &fee, &xfer)
 
-	if config.Configuration.Verbose {
+	/*if config.Configuration.Verbose {
 		tx.PrettyPrint("", os.Stdout)
 		fmt.Println("")
-	}
+	}*/
 
 	if config.Configuration.Verbose {
 		fmt.Printf("Sending Transaction:\n\tTo: %s\n\tAmount: %s\n\tNonce: %d\n\tData (bytes): %d\n\n", toAddress, amount, nonce, len(xfer.Data))
@@ -102,10 +101,10 @@ func sign(signer signature.Signer, tx *transaction.Transaction) (*transaction.Si
 		return nil, nil, err
 	}
 
-	if config.Configuration.Verbose {
+	/*if config.Configuration.Verbose {
 		sigTx.PrettyPrint("", os.Stdout)
 		fmt.Println("")
-	}
+	}*/
 
 	rawTx, err := json.Marshal(sigTx)
 	if err != nil {
