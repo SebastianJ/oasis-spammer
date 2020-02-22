@@ -34,7 +34,7 @@ func AsyncSend(signer signature.Signer, amount string, nonce uint64, gasFee stri
 func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, gasLimit uint64) error {
 	//defer signer.Reset()
 	bigAmount, _ := utils.ConvertNumeralStringToBigInt(amount)
-	r := rand.New(rand.NewSource(time.Now().Unix()))
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	toAddress := utils.RandomStringSliceItem(r, config.Configuration.Transactions.Receivers)
 
 	var xfer Transfer
