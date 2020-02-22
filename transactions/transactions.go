@@ -12,6 +12,7 @@ import (
 	"github.com/SebastianJ/oasis-spammer/config"
 	"github.com/SebastianJ/oasis-spammer/rpc"
 	"github.com/SebastianJ/oasis-spammer/utils"
+	commonCbor "github.com/oasislabs/oasis-core/go/common/cbor"
 	"github.com/oasislabs/oasis-core/go/common/crypto/signature"
 	"github.com/oasislabs/oasis-core/go/common/quantity"
 	"github.com/oasislabs/oasis-core/go/consensus/api/transaction"
@@ -57,7 +58,14 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 	}
 	fee.Gas = transaction.Gas(gasLimit)
 
-	tx := transaction.NewTransaction(nonce, &fee, api.MethodTransfer, xfer)
+	//tx := transaction.NewTransaction(nonce, &fee, api.MethodTransfer, xfer)
+
+	rawBody := commonCbor.Marshal(xfer)
+	tx := &transaction.Transaction{
+		Fee:    &fee,
+		Method: api.MethodTransfer,
+		Body:   commonCbor.RawMessage(rawBody),
+	}
 
 	//tx := staking.NewTransferTx(nonce, &fee, &xfer)
 

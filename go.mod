@@ -10,6 +10,7 @@ replace (
 )
 
 require (
+	github.com/fxamacker/cbor v1.3.2
 	github.com/oasislabs/oasis-core/go v0.0.0-20200210160800-cef4925f3105
 	github.com/prometheus/client_golang v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
