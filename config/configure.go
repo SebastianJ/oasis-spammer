@@ -26,6 +26,18 @@ func Configure(basePath string, context *cli.Context) (err error) {
 		Configuration.BasePath = basePath
 	}
 
+	if err := configureFramework(context); err != nil {
+		return err
+	}
+
+	if err := configureTransactions(context); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func configureFramework(context *cli.Context) error {
 	Configuration.Verbose = context.GlobalBool("verbose")
 
 	genesisFile, entityPath, err := setupPaths(context)
@@ -35,31 +47,40 @@ func Configure(basePath string, context *cli.Context) (err error) {
 
 	Configuration.GenesisFile = genesisFile
 	Configuration.EntityPath = entityPath
+	if ctxSocket := context.GlobalString("socket"); ctxSocket != "" && ctxSocket != Configuration.Socket {
+		Configuration.Socket = ctxSocket
+	}
 
 	if err := genesis.LoadDocument(Configuration.GenesisFile); err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func configureTransactions(context *cli.Context) error {
 	if ctxAmount := context.GlobalString("amount"); ctxAmount != "" && ctxAmount != Configuration.Transactions.Amount {
 		Configuration.Transactions.Amount = ctxAmount
-	}
-
-	if ctxSocket := context.GlobalString("socket"); ctxSocket != "" && ctxSocket != Configuration.Socket {
-		Configuration.Socket = ctxSocket
 	}
 
 	signer, err := crypto.LoadSigner(Configuration.EntityPath)
 	if err != nil {
 		return err
 	}
-	Configuration.Signer = signer
+	Configuration.Transactions.Signer = signer
+
+	txDataFilePath := filepath.Join(Configuration.BasePath, "data/data.txt")
+	txData, err := utils.ReadFileToString(txDataFilePath)
+	if err == nil && txData != "" && txData != Configuration.Transactions.Data {
+		Configuration.Transactions.Data = txData
+	}
 
 	if ctxNonce := context.GlobalInt("nonce"); ctxNonce != Configuration.Transactions.NonceValue {
 		Configuration.Transactions.NonceValue = ctxNonce
 	}
 
 	if Configuration.Transactions.NonceValue < 0 {
-		if nonce, err := rpc.CurrentNonce(Configuration.Signer, Configuration.Socket); err != nil {
+		if nonce, err := rpc.CurrentNonce(Configuration.Transactions.Signer, Configuration.Socket); err != nil {
 			Configuration.Transactions.Nonce = nonce
 		}
 	} else {

@@ -129,7 +129,7 @@ func run(context *cli.Context) error {
 		return err
 	}
 
-	transactions.AsyncBulkSendTransactions(config.Configuration.Signer, config.Configuration.Transactions.Amount, config.Configuration.Transactions.Nonce, config.Configuration.Transactions.Gas.Fee, config.Configuration.Transactions.Gas.Limit, config.Configuration.Transactions.Count, config.Configuration.Transactions.PoolSize)
+	transactions.AsyncBulkSendTransactions(config.Configuration.Transactions.Signer, config.Configuration.Transactions.Amount, config.Configuration.Transactions.Nonce, config.Configuration.Transactions.Gas.Fee, config.Configuration.Transactions.Gas.Limit, config.Configuration.Transactions.Count, config.Configuration.Transactions.PoolSize)
 
 	return nil
 }
