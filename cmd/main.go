@@ -18,7 +18,7 @@ func main() {
 	os.Setenv("GODEBUG", "netdns=go")
 
 	app := cli.NewApp()
-	app.Name = "Harmony Tx Sender - stress test and bulk transaction sending tool"
+	app.Name = "Oasis spammer - spam and stress test transactions on Oasis' network"
 	app.Version = fmt.Sprintf("%s/%s-%s", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 	app.Usage = "Use --help to see all available arguments"
 
