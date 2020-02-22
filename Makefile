@@ -8,7 +8,7 @@ flags := -gcflags="all=-N -l -c 2"
 ldflags := -X main.version=v${version} -X main.commit=${commit}
 ldflags += -X main.builtAt=${built_at} -X main.builtBy=${built_by}
 
-upload-path-linux := 's3://tools.harmony.one/release/linux-x86_64/oasis-spammer'
+upload-path-linux := 's3://tools.oasis-protocol.org/release/linux-x86_64/oasis-spammer'
 
 dist := ./dist/oasis-spammer
 env := GO111MODULE=on
