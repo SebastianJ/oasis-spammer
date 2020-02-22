@@ -1,2 +1,2 @@
 # oasis-spammer
-Spam Oasis Chain
+This is a tool to spam Oasis Tendermint based chain with invalid transactions.
