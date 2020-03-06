@@ -26,7 +26,9 @@ func AsyncBulkSendTransactions(signer signature.Signer, amount string, nonce uin
 
 		if poolIndex > 1 {
 			newNonce, err := rpc.CurrentNonce(signer, config.Configuration.Socket)
-			if err == nil {
+			if err != nil {
+				fmt.Println("Failed to refresh nonce!")
+			} else {
 				nonce = newNonce
 				fmt.Println(fmt.Sprintf("Nonce refreshed! Nonce is now: %d", nonce))
 			}

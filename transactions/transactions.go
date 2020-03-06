@@ -36,9 +36,6 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	toAddress := utils.RandomStringSliceItem(r, config.Configuration.Transactions.Receivers)
 
-	fmt.Printf("Attempting to send transaction:\n\tFrom: %s\n\tTo: %s\n\tAmount: %s\n\tNonce: %d\n\n", signer.Public().String(), toAddress, amount, nonce)
-	fmt.Println("")
-
 	var xfer Transfer
 	if err := xfer.To.UnmarshalText([]byte(toAddress)); err != nil {
 		fmt.Printf("failed to parse transfer destination ID, err: %s\n", err.Error())
@@ -46,7 +43,7 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 	}
 
 	if err := xfer.Tokens.UnmarshalText([]byte(amount)); err != nil {
-		fmt.Printf("failed to parse amount, err: %s\n", err.Error())
+		fmt.Printf("failed to parse token amount, err: %s\n", err.Error())
 		return err
 	}
 
@@ -54,7 +51,7 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 
 	var fee transaction.Fee
 	if err := fee.Amount.UnmarshalText([]byte(gasFee)); err != nil {
-		fmt.Printf("failed to parse fee amount, err: %s\n", err.Error())
+		fmt.Printf("failed to parse fee, err: %s\n", err.Error())
 		return err
 	}
 	fee.Gas = transaction.Gas(gasLimit)
