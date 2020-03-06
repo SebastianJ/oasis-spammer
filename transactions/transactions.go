@@ -36,6 +36,9 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	toAddress := utils.RandomStringSliceItem(r, config.Configuration.Transactions.Receivers)
 
+	fmt.Printf("Attempting to send transaction:\n\tFrom: %s\n\tTo: %s\n\tAmount: %s\n\tNonce: %d\n\n", signer.Public().String(), toAddress, amount, nonce)
+	fmt.Println("")
+
 	var xfer Transfer
 	if err := xfer.To.UnmarshalText([]byte(toAddress)); err != nil {
 		fmt.Printf("failed to parse transfer destination ID, err: %s\n", err.Error())
@@ -43,6 +46,7 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 	}
 
 	if err := xfer.Tokens.UnmarshalText([]byte(amount)); err != nil {
+		fmt.Printf("failed to parse amount, err: %s\n", err.Error())
 		return err
 	}
 
@@ -70,6 +74,7 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 
 	signedTx, _, err := sign(signer, tx)
 	if err != nil {
+		fmt.Printf("failed to sign tx, err: %s\n", err.Error())
 		return err
 	}
 
@@ -79,6 +84,7 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 
 	_, client, err := rpc.ConsensusClient(config.Configuration.Socket)
 	if err != nil {
+		fmt.Printf("failed to fetch consenus client tx, err: %s\n", err.Error())
 		return err
 	}
 
