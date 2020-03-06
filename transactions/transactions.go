@@ -33,7 +33,6 @@ func AsyncSend(signer signature.Signer, amount string, nonce uint64, gasFee stri
 // Send - send transactions
 func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, gasLimit uint64) error {
 	//defer signer.Reset()
-	bigAmount, _ := utils.ConvertNumeralStringToBigInt(amount)
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	toAddress := utils.RandomStringSliceItem(r, config.Configuration.Transactions.Receivers)
 
@@ -43,8 +42,7 @@ func Send(signer signature.Signer, amount string, nonce uint64, gasFee string, g
 		return err
 	}
 
-	if err := xfer.Tokens.FromBigInt(bigAmount); err != nil {
-		fmt.Printf("failed to parse transfer amount, err: %s\n", err.Error())
+	if err := xfer.Tokens.UnmarshalText([]byte(amount)); err != nil {
 		return err
 	}
 

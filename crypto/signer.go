@@ -21,6 +21,9 @@ func LoadSigner(path string) (signature.Signer, error) {
 }
 
 func loadEntity(entityDir string) (*entity.Entity, signature.Signer, error) {
-	factory := fileSigner.NewFactory(entityDir, signature.SignerEntity)
+	factory, err := fileSigner.NewFactory(entityDir, signature.SignerEntity)
+	if err != nil {
+		return nil, nil, err
+	}
 	return entity.Load(entityDir, factory)
 }
